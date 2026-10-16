@@ -2,6 +2,7 @@
 import React from "react";
 import { CheckCircle2 } from "lucide-react";
 import Summary from "../components/Summary.jsx";
+import DeliveryMap from "../components/DeliveryMap.jsx";
 
 export default function Checkout({
   checkout,
@@ -61,6 +62,21 @@ export default function Checkout({
               placeholder="House number, street, area, city, PIN code"
             />
           </label>
+
+          
+<DeliveryMap
+  onConfirm={(position) => {
+    const locationText = `Map coordinates: ${position[0].toFixed(5)}, ${position[1].toFixed(5)}`;
+
+    setCheckout({
+      ...checkout,
+      address: checkout.address
+        ? `${checkout.address}\n${locationText}`
+        : locationText
+    });
+  }}
+/>
+
 
           <div className="notice">
             <CheckCircle2 size={18} />
