@@ -2,6 +2,7 @@
 import React from "react";
 import { UserRound, MapPin } from "lucide-react";
 import Empty from "../components/Empty.jsx";
+import OrderTracking from "../components/OrderTracking.jsx";
 
 export default function Orders({
   orders,
@@ -27,12 +28,13 @@ export default function Orders({
 
       {orders.length ? (
         <div className="orders-grid">
-          {orders.map(o => (
+          {orders.map((o) => (
             <article className="order-card" key={pid(o)}>
               <div className="order-top">
                 <span className="order-id">
                   ORDER #{pid(o).slice(-8).toUpperCase()}
                 </span>
+
                 <span className={`status status-${o.status.toLowerCase()}`}>
                   {o.status}
                 </span>
@@ -42,13 +44,14 @@ export default function Orders({
                 <span>
                   <UserRound size={15} /> {o.customerName}
                 </span>
+
                 <span>
                   <MapPin size={15} /> {o.address}
                 </span>
               </div>
 
               <div className="order-products">
-                {o.items.map(i => (
+                {o.items.map((i) => (
                   <div key={String(i.product)}>
                     <span>
                       {i.name} × {i.quantity}
@@ -65,6 +68,12 @@ export default function Orders({
                 <strong>{money(o.total)}</strong>
               </div>
 
+              {/* Customer order tracking */}
+              {!isFarmer && (
+                <OrderTracking status={o.status} />
+              )}
+
+              {/* Existing farmer order controls */}
               {isFarmer && (
                 <div className="order-actions">
                   {(o.status === "Placed"
@@ -74,7 +83,7 @@ export default function Orders({
                       : o.status === "Packed"
                         ? ["Delivered"]
                         : []
-                  ).map(status => (
+                  ).map((status) => (
                     <button
                       className="btn btn-outline small"
                       key={status}

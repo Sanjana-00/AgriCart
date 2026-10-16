@@ -308,3 +308,175 @@
   color: #f6d365;
 }
 
+
+/* ===== Order Tracking Timeline ===== */
+
+.order-tracking {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-color, #e1e9df);
+}
+
+.order-tracking h3 {
+  margin: 0 0 20px;
+  font-size: 18px;
+  color: var(--text-primary, #183b2b);
+}
+
+.tracking-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.tracking-step {
+  display: flex;
+  gap: 14px;
+  position: relative;
+  min-height: 78px;
+  padding-bottom: 18px;
+  color: var(--text-secondary, #647568);
+}
+
+/* Vertical line between stages */
+.tracking-step:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 25px;
+  bottom: -2px;
+  width: 2px;
+  background: var(--border-color, #dce5dc);
+}
+
+/* Completed progress line */
+.tracking-step.completed:not(:last-child)::before {
+  background: #27834f;
+}
+
+.tracking-marker {
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+  background: var(--surface-bg, #fff);
+  color: #9aa79c;
+}
+
+.tracking-step.completed .tracking-marker {
+  color: #27834f;
+}
+
+.tracking-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.tracking-info strong {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 5px;
+  color: var(--text-secondary, #647568);
+}
+
+.tracking-info p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary, #647568);
+}
+
+/* Current stage */
+.tracking-step.completed .tracking-info strong {
+  color: var(--text-primary, #183b2b);
+}
+
+.tracking-current {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 4px 9px;
+  border-radius: 20px;
+  background: #e6f3e8;
+  color: #216a43;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Cancelled order */
+.tracking-cancelled {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-top: 20px;
+  padding: 14px;
+  border-radius: 12px;
+  background: #fff0f0;
+  color: #b42318;
+}
+
+.tracking-cancelled p {
+  margin: 5px 0 0;
+  font-size: 13px;
+}
+
+/* Dark mode */
+[data-theme="dark"] .tracking-current {
+  background: #244a34;
+  color: #b8efc6;
+}
+
+[data-theme="dark"] .tracking-cancelled {
+  background: #482625;
+  color: #ffb4ad;
+}
+
+
+/* ===== Collapsible Order Tracking ===== */
+
+.tracking-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+  border: none;
+  background: transparent;
+  color: var(--text-primary, #183b2b);
+  text-align: left;
+  cursor: pointer;
+}
+
+.tracking-toggle > span {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tracking-toggle strong {
+  font-size: 17px;
+}
+
+.tracking-toggle small {
+  color: var(--text-secondary, #647568);
+  font-size: 12px;
+}
+
+.tracking-toggle > svg {
+  flex-shrink: 0;
+  color: #27834f;
+}
+
+.tracking-toggle:focus-visible {
+  outline: 2px solid #27834f;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+[data-theme="dark"] .tracking-toggle {
+  color: var(--text-primary);
+}
