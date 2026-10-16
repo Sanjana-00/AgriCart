@@ -157,3 +157,154 @@
   margin-left: auto;
   margin-right: auto;
 }
+
+
+
+/* ===== AgriCart Dark Mode ===== */
+
+:root {
+  color-scheme: light;
+  --page-bg: #f5f7f2;
+  --surface-bg: #ffffff;
+  --text-primary: #183b2b;
+  --text-secondary: #647568;
+  --border-color: #e1e9df;
+  --input-bg: #f8faf7;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --page-bg: #111d18;
+  --surface-bg: #1e3027;
+  --text-primary: #e8f1e8;
+  --text-secondary: #b7c8ba;
+  --border-color: #344b3d;
+  --input-bg: #24382d;
+}
+
+/* Main page */
+[data-theme="dark"] body,
+[data-theme="dark"] .app-shell {
+  background-color: var(--page-bg);
+  color: var(--text-primary);
+}
+
+/* Common surfaces */
+[data-theme="dark"] .topbar,
+[data-theme="dark"] .nav-row,
+[data-theme="dark"] .product-card,
+[data-theme="dark"] .summary,
+[data-theme="dark"] .modal,
+[data-theme="dark"] .user-chip {
+  background-color: var(--surface-bg);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+/* Text */
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] p,
+[data-theme="dark"] label,
+[data-theme="dark"] strong {
+  color: var(--text-primary);
+}
+
+/* Inputs */
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+/* Navigation and buttons */
+[data-theme="dark"] .nav-item,
+[data-theme="dark"] .fresh-note {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .category-pill {
+  background-color: var(--surface-bg);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+
+/* ===== AgriCart Dark Mode Improvements ===== */
+
+[data-theme="dark"] body {
+  background: var(--page-bg);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] main,
+[data-theme="dark"] .section-head,
+[data-theme="dark"] .benefits,
+[data-theme="dark"] .category-row,
+[data-theme="dark"] .product-grid,
+[data-theme="dark"] .page-content {
+  color: var(--text-primary);
+}
+
+/* Cards and panels */
+[data-theme="dark"] .product-card,
+[data-theme="dark"] .summary,
+[data-theme="dark"] .empty-state,
+[data-theme="dark"] .order-card,
+[data-theme="dark"] .manage-card,
+[data-theme="dark"] .cart-item,
+[data-theme="dark"] .checkout-card {
+  background: var(--surface-bg);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+/* Secondary text */
+[data-theme="dark"] small,
+[data-theme="dark"] .muted,
+[data-theme="dark"] .result-count {
+  color: var(--text-secondary);
+}
+
+/* Form controls */
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  background: var(--input-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: var(--text-secondary);
+}
+
+/* Modals */
+[data-theme="dark"] .modal-overlay {
+  background: rgba(0, 0, 0, 0.72);
+}
+
+[data-theme="dark"] .modal,
+[data-theme="dark"] .modal-content {
+  background: var(--surface-bg);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+/* Theme toggle */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+[data-theme="dark"] .theme-toggle {
+  color: #f6d365;
+}
+
