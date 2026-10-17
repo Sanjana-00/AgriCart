@@ -7,6 +7,7 @@ import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
+import farmerAnalyticsRoutes from "./routes/farmerAnalyticsRoutes.js";
 import { notFound, errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
@@ -19,6 +20,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/farmer-analytics", farmerAnalyticsRoutes);
 app.use(notFound);
 app.use(errorHandler);
 

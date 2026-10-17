@@ -16,6 +16,7 @@ import ProductModal from "./components/ProductModal.jsx";
 import ProductDetails from "./pages/ProductDetails.jsx";
 import Toast from "./components/Toast.jsx";
 import translations from "./data/translations.js";
+import FarmerAnalytics from "./components/FarmerAnalytics.jsx";
 import AIShoppingAssistant from "./components/AIShoppingAssistant.jsx";
 import React, { useEffect, useMemo, useState } from "react";
 import {
@@ -33,7 +34,8 @@ import {
   CheckCircle2,
   Store,
   ArrowRight,
-  X
+  X,
+  TrendingUp
 } from "lucide-react";
 
 
@@ -491,8 +493,15 @@ function changeLanguage(event) {
         ]
       : []),
     ...(isFarmer
-      ? [{ id: "manage", label: "My produce", icon: Leaf }]
-      : [])
+  ? [
+      { id: "manage", label: "My produce", icon: Leaf },
+      {
+        id: "analytics",
+        label: "Analytics",
+        icon: TrendingUp
+      }
+    ]
+  : [])
   ];
 
   return (
@@ -572,6 +581,9 @@ toggleTheme={toggleTheme}
   />
 )}
 
+{screen === "analytics" && isFarmer && (
+  <FarmerAnalytics user={user} />
+)}
 
       
 {screen === "cart" && (

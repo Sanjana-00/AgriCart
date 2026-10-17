@@ -1,6 +1,11 @@
-
 import React from "react";
-import { Store, Package, ShoppingCart, Leaf } from "lucide-react";
+import {
+  Store,
+  Package,
+  ShoppingCart,
+  Leaf,
+  TrendingUp
+} from "lucide-react";
 
 export default function Navbar({
   user,
@@ -14,18 +19,34 @@ export default function Navbar({
 
   const nav = [
     { id: "home", label: t.marketplace, icon: Store },
+
     ...(user
       ? [{ id: "orders", label: t.orders, icon: Package }]
       : []),
+
     ...(!isFarmer && user
-      ? [{
-          id: "cart",
-          label: `${t.cart}${cartCount ? ` (${cartCount})` : ""}`,
-          icon: ShoppingCart
-        }]
+      ? [
+          {
+            id: "cart",
+            label: `${t.cart}${cartCount ? ` (${cartCount})` : ""}`,
+            icon: ShoppingCart
+          }
+        ]
       : []),
+
     ...(isFarmer
-      ? [{ id: "manage", label: t.myProduce, icon: Leaf }]
+      ? [
+          {
+            id: "manage",
+            label: t.myProduce,
+            icon: Leaf
+          },
+          {
+            id: "analytics",
+            label: "Analytics",
+            icon: TrendingUp
+          }
+        ]
       : [])
   ];
 
@@ -37,6 +58,7 @@ export default function Navbar({
           className={`nav-item ${screen === n.id ? "active" : ""}`}
           onClick={() => {
             setScreen(n.id);
+
             if (n.id !== "product") {
               setSelectedProduct(null);
             }
@@ -50,7 +72,8 @@ export default function Navbar({
       <span className="nav-spacer" />
 
       <span className="fresh-note">
-        <Leaf size={15} /> {t.supportingFarmers}
+        <Leaf size={15} />
+        {t.supportingFarmers}
       </span>
     </nav>
   );
