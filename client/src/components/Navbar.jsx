@@ -45,9 +45,22 @@ export default function Navbar({
             id: "analytics",
             label: "Analytics",
             icon: TrendingUp
+          },
+          {
+            id: "surplus-manage",
+            label: "Manage Surplus",
+            icon: Leaf
           }
         ]
-      : [])
+      : user
+        ? [
+            {
+              id: "surplus",
+              label: "Surplus Deals",
+              icon: Leaf
+            }
+          ]
+        : [])
   ];
 
   return (

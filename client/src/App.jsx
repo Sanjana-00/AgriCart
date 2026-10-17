@@ -18,6 +18,8 @@ import Toast from "./components/Toast.jsx";
 import translations from "./data/translations.js";
 import FarmerAnalytics from "./components/FarmerAnalytics.jsx";
 import AIShoppingAssistant from "./components/AIShoppingAssistant.jsx";
+import SurplusManagement from "./components/SurplusManagement.jsx";
+import SurplusDeals from "./components/SurplusDeals.jsx";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Sprout,
@@ -275,65 +277,95 @@ function changeLanguage(event) {
   }
 
   function addToCart(p) {
-    if (!user) {
-      setShowAuth(true);
-      return;
-    }
+  if (!user) {
+    setShowAuth(true);
+    return;
+  }
 
-    if (user.role !== "Customer") {
-      notify("Switch to Customer role to shop.");
-      return;
-    }
+  if (user.role !== "Customer") {
+    notify("Switch to Customer role to shop.");
+    return;
+  }
 
-    setCart((old) => {
-      const found = old.find((x) => x.id === pid(p));
+  const productId = pid(p);
+  const isSurplus = p.isSurplus === true;
+  const cartId = isSurplus
+    ? `${productId}-surplus`
+    : productId;
 
-      if (found) {
-        return old.map((x) =>
-          x.id === pid(p)
-            ? {
-                ...x,
-                quantity: Math.min(
-                  x.quantity + 1,
-                  p.quantity
-                )
-              }
-            : x
-        );
+  const availableQuantity = Number(p.quantity);
+  const price = Number(p.price);
+
+  if (
+    !Number.isFinite(availableQuantity) ||
+    availableQuantity <= 0 ||
+    !Number.isFinite(price) ||
+    price <= 0
+  ) {
+    notify("This product is currently unavailable.");
+    return;
+  }
+
+  setCart((old) => {
+    const found = old.find((item) => item.id === cartId);
+
+    if (found) {
+      if (found.quantity >= availableQuantity) {
+        notify("You have reached the available quantity.");
+        return old;
       }
 
-      return [
-        ...old,
-        {
-          ...p,
-          id: pid(p),
-          quantity: 1
-        }
-      ];
-    });
-
-    notify(`${p.name} added to cart`);
-  }
-
-  function changeQty(id, delta) {
-    setCart((old) =>
-      old.map((x) =>
-        x.id === id
+      return old.map((item) =>
+        item.id === cartId
           ? {
-              ...x,
-              quantity: Math.max(
-                1,
-                Math.min(
-                  x.quantity + delta,
-                  products.find((p) => pid(p) === id)
-                    ?.quantity || x.quantity
-                )
+              ...item,
+              quantity: Math.min(
+                item.quantity + 1,
+                availableQuantity
               )
             }
-          : x
-      )
-    );
-  }
+          : item
+      );
+    }
+
+    return [
+      ...old,
+      {
+        ...p,
+        id: cartId,
+        productId,
+        isSurplus,
+        price,
+        quantity: 1
+      }
+    ];
+  });
+
+  notify(`${p.name} added to cart`);
+}
+
+  function changeQty(id, delta) {
+  setCart((old) =>
+    old.map((item) => {
+      if (item.id !== id) return item;
+
+      const availableQuantity = item.isSurplus
+        ? Number(item.quantityAvailable ?? item.quantity)
+        : Number(
+            products.find((p) => pid(p) === (item.productId || item.id))
+              ?.quantity ?? item.quantity
+          );
+
+      return {
+        ...item,
+        quantity: Math.max(
+          1,
+          Math.min(item.quantity + delta, availableQuantity)
+        )
+      };
+    })
+  );
+}
 
   async function saveProduct(e) {
     e.preventDefault();
@@ -421,41 +453,42 @@ function changeLanguage(event) {
   }
 
   async function placeOrder(e) {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!cart.length) {
-      return notify("Your cart is empty.");
-    }
-
-    setLoading(true);
-
-    try {
-      const order = await api("/orders", {
-        method: "POST",
-        body: JSON.stringify({
-          customerName: checkout.name,
-          customerPhone: checkout.phone,
-          address: checkout.address,
-          items: cart.map((x) => ({
-            productId: x.id,
-            quantity: x.quantity
-          }))
-        })
-      });
-
-      setCart([]);
-      setOrders((old) => [order, ...old]);
-
-      await loadProducts();
-
-      setScreen("orders");
-      notify("Order placed successfully!");
-    } catch (e) {
-      notify(e.message);
-    } finally {
-      setLoading(false);
-    }
+  if (!cart.length) {
+    return notify("Your cart is empty.");
   }
+
+  setLoading(true);
+
+  try {
+    const order = await api("/orders", {
+      method: "POST",
+      body: JSON.stringify({
+        customerName: checkout.name,
+        customerPhone: checkout.phone,
+        address: checkout.address,
+        items: cart.map((item) => ({
+          productId: item.productId || item.id,
+          quantity: item.quantity,
+          isSurplus: item.isSurplus === true
+        }))
+      })
+    });
+
+    setCart([]);
+    setOrders((old) => [order, ...old]);
+
+    await loadProducts();
+
+    setScreen("orders");
+    notify("Order placed successfully!");
+  } catch (e) {
+    notify(e.message);
+  } finally {
+    setLoading(false);
+  }
+}
 
   async function updateOrder(id, status) {
     try {
@@ -579,6 +612,14 @@ toggleTheme={toggleTheme}
     setProductForm={setProductForm}
     setShowProduct={setShowProduct}
   />
+)}
+
+{screen === "surplus-manage" && isFarmer && (
+  <SurplusManagement user={user} />
+)}
+
+{screen === "surplus" && !isFarmer && (
+  <SurplusDeals addToCart={addToCart} />
 )}
 
 {screen === "analytics" && isFarmer && (

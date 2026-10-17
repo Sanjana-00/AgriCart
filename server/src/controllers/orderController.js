@@ -34,7 +34,6 @@ export async function createOrder(req, res, next) {
       items
     } = req.body || {};
 
-    // 1. Validate customer details and cart
     if (
       typeof customerName !== "string" ||
       !customerName.trim() ||
@@ -46,17 +45,12 @@ export async function createOrder(req, res, next) {
       items.length === 0
     ) {
       return res.status(400).json({
-        message:
-          "Please complete delivery details and add at least one item."
+        message: "Please complete delivery details and add at least one item."
       });
     }
 
-    // 2. Validate all cart items before changing stock
     for (const item of items) {
-      if (
-        !item ||
-        !mongoose.isValidObjectId(item.productId)
-      ) {
+      if (!item || !mongoose.isValidObjectId(item.productId)) {
         return res.status(400).json({
           message: "Invalid product ID."
         });
@@ -71,53 +65,98 @@ export async function createOrder(req, res, next) {
       }
     }
 
-    // 3. Reserve stock and prepare order items
     const finalItems = [];
 
     for (const item of items) {
       const quantity = Number(item.quantity);
+      const isSurplus = item.isSurplus === true;
 
-      const product = await Product.findOneAndUpdate(
-        {
-          _id: item.productId,
-          available: true,
-          quantity: { $gte: quantity }
-        },
-        {
-          $inc: { quantity: -quantity }
-        },
-        {
-          new: true
-        }
-      );
+      let product;
 
-      if (!product) {
-        const error = new Error(
-          "A product is unavailable or has insufficient stock. " +
-          "Refresh the catalogue and try again."
+      if (isSurplus) {
+        // Reserve both regular stock and surplus stock atomically.
+        product = await Product.findOneAndUpdate(
+          {
+            _id: item.productId,
+            available: true,
+            quantity: { $gte: quantity },
+            rescueEnabled: true,
+            rescueQuantity: { $gte: quantity },
+            rescuePrice: { $gt: 0 },
+            $expr: { $lt: ["$rescuePrice", "$price"] },
+            rescueExpiry: { $gt: new Date() }
+          },
+          {
+            $inc: {
+              quantity: -quantity,
+              rescueQuantity: -quantity
+            }
+          },
+          { new: true }
         );
 
-        error.status = 400;
-        throw error;
+        if (!product) {
+          const error = new Error(
+            "This surplus offer has expired or has insufficient stock. Refresh Surplus Deals and try again."
+          );
+          error.status = 400;
+          throw error;
+        }
+
+        reservedStock.push({
+          productId: product._id,
+          quantity,
+          isSurplus: true
+        });
+
+        finalItems.push({
+          product: product._id,
+          name: product.name,
+          price: product.rescuePrice,
+          unit: product.unit,
+          quantity,
+          farmer: product.farmer,
+          isSurplus: true
+        });
+      } else {
+        product = await Product.findOneAndUpdate(
+          {
+            _id: item.productId,
+            available: true,
+            quantity: { $gte: quantity }
+          },
+          {
+            $inc: { quantity: -quantity }
+          },
+          { new: true }
+        );
+
+        if (!product) {
+          const error = new Error(
+            "A product is unavailable or has insufficient stock. Refresh the catalogue and try again."
+          );
+          error.status = 400;
+          throw error;
+        }
+
+        reservedStock.push({
+          productId: product._id,
+          quantity,
+          isSurplus: false
+        });
+
+        finalItems.push({
+          product: product._id,
+          name: product.name,
+          price: product.price,
+          unit: product.unit,
+          quantity,
+          farmer: product.farmer,
+          isSurplus: false
+        });
       }
-
-      // Remember each stock change for possible restoration
-      reservedStock.push({
-        productId: product._id,
-        quantity
-      });
-
-      finalItems.push({
-        product: product._id,
-        name: product.name,
-        price: product.price,
-        unit: product.unit,
-        quantity,
-        farmer: product.farmer
-      });
     }
 
-    // 4. Calculate prices on the server
     const subtotal = finalItems.reduce(
       (sum, item) => sum + item.price * item.quantity,
       0
@@ -126,7 +165,6 @@ export async function createOrder(req, res, next) {
     const deliveryFee = subtotal >= 300 ? 0 : 30;
     const total = subtotal + deliveryFee;
 
-    // 5. Save the order
     const order = await Order.create({
       customerName: customerName.trim(),
       customerPhone: customerPhone.trim(),
@@ -140,25 +178,29 @@ export async function createOrder(req, res, next) {
       status: "Placed"
     });
 
-    // Stock changes are now associated with the saved order
+    // The order was saved successfully; do not roll back its stock.
     reservedStock.length = 0;
 
-    // 6. Send the created order to the frontend
     return res.status(201).json(order);
-
   } catch (error) {
-    // 7. Try to restore stock if order creation failed
+    // Restore the exact stock fields reserved by this order attempt.
     for (const reservation of reservedStock.reverse()) {
       try {
+        const increment = reservation.isSurplus
+          ? {
+              quantity: reservation.quantity,
+              rescueQuantity: reservation.quantity
+            }
+          : {
+              quantity: reservation.quantity
+            };
+
         await Product.updateOne(
           { _id: reservation.productId },
-          { $inc: { quantity: reservation.quantity } }
+          { $inc: increment }
         );
       } catch (rollbackError) {
-        console.error(
-          "Failed to restore product stock:",
-          rollbackError
-        );
+        console.error("Failed to restore product stock:", rollbackError);
       }
     }
 
