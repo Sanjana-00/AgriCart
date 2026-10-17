@@ -16,6 +16,7 @@ import ProductModal from "./components/ProductModal.jsx";
 import ProductDetails from "./pages/ProductDetails.jsx";
 import Toast from "./components/Toast.jsx";
 import translations from "./data/translations.js";
+import AIShoppingAssistant from "./components/AIShoppingAssistant.jsx";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Sprout,
@@ -638,8 +639,13 @@ toggleTheme={toggleTheme}
 )}
 
 
-      <Toast message={toast} />
-    </div>
+     <Toast message={toast} />
+
+<AIShoppingAssistant
+  addToCart={addToCart}
+  user={user}
+/>
+</div>
   );
 }
 
