@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import "./AIShoppingAssistant.css";
 
-const API = "http://localhost:5000/api";
+const API = `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api`;
 const ARI_IMAGE = "/ari-mascot.png";
 
 const FALLBACK_PRODUCT_IMAGE =

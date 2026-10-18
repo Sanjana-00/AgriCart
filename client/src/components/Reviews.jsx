@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useState } from "react";
 import "./Reviews.css";
 
-const API_URL = "http://localhost:5000/api/reviews";
+const API_URL = `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/reviews`;
 
 export default function Reviews({ productId, customer }) {
   const [reviews, setReviews] = useState([]);

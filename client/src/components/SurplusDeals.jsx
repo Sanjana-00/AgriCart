@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { RefreshCw, ShoppingCart } from "lucide-react";
 
-const API = "http://localhost:5000/api";
+const API = `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api`;
 
 export default function SurplusDeals({ addToCart }) {
   const [offers, setOffers] = useState([]);

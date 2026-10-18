@@ -23,7 +23,7 @@ import {
 } from "recharts";
 import "./FarmerAnalytics.css";
 
-const API = "http://localhost:5000/api";
+const API = `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api`;
 
 const money = (value) =>
   `₹${Number(value || 0).toLocaleString("en-IN", {
