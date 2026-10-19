@@ -1,4 +1,4 @@
-# AgriCart — MVC Starter (React + Express + MongoDB)
+# AgriCart (React + Express + MongoDB)
 
 This version reorganizes the AgriCart starter into separate routes, controllers, models, services, middleware, and configuration.
 
